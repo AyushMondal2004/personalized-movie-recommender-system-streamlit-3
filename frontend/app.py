@@ -82,6 +82,67 @@ elif st.session_state['page'] == 'main':
             st.session_state['page'] = 'login'
             st.rerun()
     # Sidebar filters
+
+elif st.session_state['page'] == 'movie_detail':
+    # Movie detail view
+    movie_id = st.session_state.get('selected_movie_id')
+    if movie_id is not None:
+        details = tmdb.get_movie_details(movie_id)
+        # Back button at top left
+        if st.button('← Back', key='back_button'):
+            st.session_state['page'] = 'main'
+            st.session_state.pop('selected_movie_id', None)
+            st.rerun()
+        # Show poster and all details
+        col_img, col_info = st.columns([1,2])
+        with col_img:
+            st.image(f"https://image.tmdb.org/t/p/w500{details.get('poster_path')}", width=250)
+        with col_info:
+            st.markdown(f"# {details.get('title', 'No Title')}")
+            st.write(f"**Tagline:** {details.get('tagline', '')}")
+            st.write(f"**Overview:** {details.get('overview', '')}")
+            st.write(f"**Release Date:** {details.get('release_date', 'N/A')}")
+            st.write(f"**Runtime:** {details.get('runtime', 'N/A')} min")
+            st.write(f"**Status:** {details.get('status', 'N/A')}")
+            st.write(f"**Budget:** ${details.get('budget', 0):,}")
+            st.write(f"**Revenue:** ${details.get('revenue', 0):,}")
+            st.write(f"**Popularity:** {details.get('popularity', 'N/A')}")
+            st.write(f"**Vote Average:** {details.get('vote_average', 'N/A')}")
+            st.write(f"**Vote Count:** {details.get('vote_count', 'N/A')}")
+            st.write(f"**Homepage:** {details.get('homepage', 'N/A')}")
+            st.write(f"**Original Title:** {details.get('original_title', 'N/A')}")
+            st.write(f"**Original Language:** {details.get('original_language', 'N/A')}")
+            st.write(f"**Movie ID:** {details.get('id', 'N/A')}")
+            # Genres
+            genres = details.get('genres', [])
+            if genres:
+                st.write(f"**Genres:** {', '.join([g['name'] for g in genres])}")
+            # Keywords
+            keywords = details.get('keywords', {}).get('keywords', [])
+            if keywords:
+                st.write(f"**Keywords:** {', '.join([k['name'] for k in keywords])}")
+            # Production companies
+            prod_comp = details.get('production_companies', [])
+            if prod_comp:
+                st.write(f"**Production Companies:** {', '.join([c['name'] for c in prod_comp])}")
+            # Production countries
+            prod_countries = details.get('production_countries', [])
+            if prod_countries:
+                st.write(f"**Production Countries:** {', '.join([c['name'] for c in prod_countries])}")
+            # Spoken languages
+            spoken_langs = details.get('spoken_languages', [])
+            if spoken_langs:
+                st.write(f"**Spoken Languages:** {', '.join([l['name'] for l in spoken_langs])}")
+            # Cast
+            credits = details.get('credits', {})
+            cast = credits.get('cast', [])
+            if cast:
+                st.write(f"**Cast:** {', '.join([c['name'] for c in cast[:10]])}")
+            # Crew
+            crew = credits.get('crew', [])
+            if crew:
+                st.write(f"**Crew:** {', '.join([c['name']+' ('+c['job']+')' for c in crew[:10]])}")
+
     st.sidebar.header("Advanced Filters")
     genre_options = {
         "Action": 28, "Adventure": 12, "Animation": 16, "Comedy": 35, "Crime": 80, "Documentary": 99, "Drama": 18, "Family": 10751, "Fantasy": 14, "History": 36, "Horror": 27, "Music": 10402, "Mystery": 9648, "Romance": 10749, "Science Fiction": 878, "TV Movie": 10770, "Thriller": 53, "War": 10752, "Western": 37
@@ -132,7 +193,12 @@ elif st.session_state['page'] == 'main':
                 for j, movie in enumerate(movies_to_show[i:i+num_cols]):
                     with cols[j]:
                         st.image(f"https://image.tmdb.org/t/p/w200{movie.get('poster_path')}", width=150)
-                        st.markdown(f"**{movie.get('title', 'No Title')}** ({movie.get('release_date', '')[:4]})")
+                        # Movie title as clickable link to details page
+                        if st.button(f"{movie.get('title', 'No Title')} ({movie.get('release_date', '')[:4]})", key=f"title_{movie.get('id')}"):
+                            st.session_state['page'] = 'movie_detail'
+                            st.session_state['selected_movie_id'] = movie.get('id')
+                        # Optionally, display as hyperlink style
+                        # st.markdown(f"<a href='#' style='color:#E50914;font-weight:bold;'>{movie.get('title', 'No Title')} ({movie.get('release_date', '')[:4]})</a>", unsafe_allow_html=True)
                         genre_names = [genre_id_to_name.get(g, str(g)) for g in movie.get('genre_ids', [])]
                         st.write(f"Genres: {', '.join(genre_names)}")
                         st.write(f"Rating: {movie.get('vote_average', 0)}/10")

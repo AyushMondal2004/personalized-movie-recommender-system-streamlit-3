@@ -123,11 +123,44 @@ elif st.session_state['page'] == 'main':
         elif ((query and search_clicked) or filter_clicked) and not results:
             st.warning("No movies found for your search.")
         elif results:
-            for movie in results[:20]:
-                st.image(f"https://image.tmdb.org/t/p/w200{movie.get('poster_path')}", width=100)
-                st.write(f"**{movie.get('title')}** ({movie.get('release_date', '')[:4]})")
-                st.write(f"Genres: {', '.join([str(g) for g in movie.get('genre_ids', [])])}")
-                st.write(f"Rating: {movie.get('vote_average', 0)}/10")
-                if st.button(f"View Details {movie.get('id')}"):
-                    # TODO: Display details, update history, show recommendations
-                    pass
+            # Genre ID to name mapping (should match TMDb)
+            genre_id_to_name = {28: "Action", 12: "Adventure", 16: "Animation", 35: "Comedy", 80: "Crime", 99: "Documentary", 18: "Drama", 10751: "Family", 14: "Fantasy", 36: "History", 27: "Horror", 10402: "Music", 9648: "Mystery", 10749: "Romance", 878: "Science Fiction", 10770: "TV Movie", 53: "Thriller", 10752: "War", 37: "Western"}
+            num_cols = 4
+            movies_to_show = results[:50]
+            for i in range(0, len(movies_to_show), num_cols):
+                cols = st.columns(num_cols)
+                for j, movie in enumerate(movies_to_show[i:i+num_cols]):
+                    with cols[j]:
+                        st.image(f"https://image.tmdb.org/t/p/w200{movie.get('poster_path')}", width=150)
+                        st.markdown(f"**{movie.get('title', 'No Title')}** ({movie.get('release_date', '')[:4]})")
+                        genre_names = [genre_id_to_name.get(g, str(g)) for g in movie.get('genre_ids', [])]
+                        st.write(f"Genres: {', '.join(genre_names)}")
+                        st.write(f"Rating: {movie.get('vote_average', 0)}/10")
+                        if st.button(f"View Details {movie.get('id')}"):
+                            details = tmdb.get_movie_details(movie.get('id'))
+                            log_search_history(user_id, movie_id=movie.get('id'))
+                            # Show all details in an expander
+                            with st.expander(f"Details for {movie.get('title', 'No Title')}", expanded=True):
+                                st.image(f"https://image.tmdb.org/t/p/w500{details.get('poster_path')}", width=250)
+                                st.markdown(f"### {details.get('title', 'No Title')}")
+                                st.write(f"Release Date: {details.get('release_date', 'N/A')}")
+                                st.write(f"Runtime: {details.get('runtime', 'N/A')} minutes")
+                                st.write(f"Genres: {', '.join([g['name'] for g in details.get('genres', [])])}")
+                                st.write(f"Overview: {details.get('overview', 'No overview available.')}")
+                                st.write(f"Rating: {details.get('vote_average', 'N/A')}/10 from {details.get('vote_count', 'N/A')} votes")
+                                st.write(f"Status: {details.get('status', 'N/A')}")
+                                st.write(f"Original Language: {details.get('original_language', 'N/A')}")
+                                st.write(f"Budget: ${details.get('budget', 0):,}")
+                                st.write(f"Revenue: ${details.get('revenue', 0):,}")
+                                # Show cast if available
+                                credits = details.get('credits', {})
+                                if 'cast' in credits:
+                                    st.write("**Cast:** " + ', '.join([c['name'] for c in credits['cast'][:10]]))
+                                if 'crew' in credits:
+                                    directors = [c['name'] for c in credits['crew'] if c['job'] == 'Director']
+                                    if directors:
+                                        st.write("**Director(s):** " + ', '.join(directors))
+                                # Show keywords if available
+                                keywords = details.get('keywords', {}).get('keywords', [])
+                                if keywords:
+                                    st.write("**Keywords:** " + ', '.join([k['name'] for k in keywords]))

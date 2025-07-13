@@ -137,30 +137,37 @@ elif st.session_state['page'] == 'main':
                         st.write(f"Genres: {', '.join(genre_names)}")
                         st.write(f"Rating: {movie.get('vote_average', 0)}/10")
                         if st.button(f"View Details {movie.get('id')}"):
-                            details = tmdb.get_movie_details(movie.get('id'))
-                            log_search_history(user_id, movie_id=movie.get('id'))
-                            # Show all details in an expander
-                            with st.expander(f"Details for {movie.get('title', 'No Title')}", expanded=True):
-                                st.image(f"https://image.tmdb.org/t/p/w500{details.get('poster_path')}", width=250)
-                                st.markdown(f"### {details.get('title', 'No Title')}")
-                                st.write(f"Release Date: {details.get('release_date', 'N/A')}")
-                                st.write(f"Runtime: {details.get('runtime', 'N/A')} minutes")
-                                st.write(f"Genres: {', '.join([g['name'] for g in details.get('genres', [])])}")
-                                st.write(f"Overview: {details.get('overview', 'No overview available.')}")
-                                st.write(f"Rating: {details.get('vote_average', 'N/A')}/10 from {details.get('vote_count', 'N/A')} votes")
-                                st.write(f"Status: {details.get('status', 'N/A')}")
-                                st.write(f"Original Language: {details.get('original_language', 'N/A')}")
-                                st.write(f"Budget: ${details.get('budget', 0):,}")
-                                st.write(f"Revenue: ${details.get('revenue', 0):,}")
-                                # Show cast if available
-                                credits = details.get('credits', {})
-                                if 'cast' in credits:
-                                    st.write("**Cast:** " + ', '.join([c['name'] for c in credits['cast'][:10]]))
-                                if 'crew' in credits:
-                                    directors = [c['name'] for c in credits['crew'] if c['job'] == 'Director']
-                                    if directors:
-                                        st.write("**Director(s):** " + ', '.join(directors))
-                                # Show keywords if available
-                                keywords = details.get('keywords', {}).get('keywords', [])
-                                if keywords:
-                                    st.write("**Keywords:** " + ', '.join([k['name'] for k in keywords]))
+                            st.session_state['selected_movie_id'] = movie.get('id')
+                            st.session_state['selected_movie_title'] = movie.get('title', 'No Title')
+
+            # After the grid, show details if a movie is selected
+            selected_id = st.session_state.get('selected_movie_id', None)
+            if selected_id:
+                details = tmdb.get_movie_details(selected_id)
+                log_search_history(user_id, movie_id=selected_id)
+                with st.expander(f"Details for {st.session_state.get('selected_movie_title', 'No Title')}", expanded=True):
+                    st.image(f"https://image.tmdb.org/t/p/w500{details.get('poster_path')}", width=250)
+                    st.markdown(f"### {details.get('title', 'No Title')}")
+                    st.write(f"Release Date: {details.get('release_date', 'N/A')}")
+                    st.write(f"Runtime: {details.get('runtime', 'N/A')} minutes")
+                    st.write(f"Genres: {', '.join([g['name'] for g in details.get('genres', [])])}")
+                    st.write(f"Overview: {details.get('overview', 'No overview available.')}")
+                    st.write(f"Rating: {details.get('vote_average', 'N/A')}/10 from {details.get('vote_count', 'N/A')} votes")
+                    st.write(f"Status: {details.get('status', 'N/A')}")
+                    st.write(f"Original Language: {details.get('original_language', 'N/A')}")
+                    st.write(f"Budget: ${details.get('budget', 0):,}")
+                    st.write(f"Revenue: ${details.get('revenue', 0):,}")
+                    credits = details.get('credits', {})
+                    if 'cast' in credits:
+                        st.write("**Cast:** " + ', '.join([c['name'] for c in credits['cast'][:10]]))
+                    if 'crew' in credits:
+                        directors = [c['name'] for c in credits['crew'] if c['job'] == 'Director']
+                        if directors:
+                            st.write("**Director(s):** " + ', '.join(directors))
+                    keywords = details.get('keywords', {}).get('keywords', [])
+                    if keywords:
+                        st.write("**Keywords:** " + ', '.join([k['name'] for k in keywords]))
+                    if st.button("Close Details"):
+                        del st.session_state['selected_movie_id']
+                        del st.session_state['selected_movie_title']
+                        st.experimental_rerun()

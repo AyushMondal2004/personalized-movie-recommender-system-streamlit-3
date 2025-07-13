@@ -112,8 +112,7 @@ elif st.session_state['page'] == 'main':
             log_search_history(user_id, query=None, genres=selected_genres, year=year)
         elif query and search_clicked:
             with st.spinner("Searching for movies..."):
-                results, api_error = tmdb.search_movies(query)
-        # If search_movies is also paginated, use num_movies=50 if implemented
+                results, api_error = tmdb.search_movies(query, num_movies=50)
             # Log title search
             log_search_history(user_id, query=query, genres=None, year=None)
         elif not query and not filter_clicked:

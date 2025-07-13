@@ -8,13 +8,22 @@ TMDB_API_KEY = os.getenv('TMDB_API_KEY')
 TMDB_BASE_URL = 'https://api.themoviedb.org/3'
 
 
-def search_movies(query):
+def search_movies(query, num_movies=50):
     url = f"{TMDB_BASE_URL}/search/movie"
-    params = {'api_key': TMDB_API_KEY, 'query': query}
+    params = {'api_key': TMDB_API_KEY, 'query': query, 'page': 1}
+    movies = []
     try:
-        response = requests.get(url, params=params, timeout=20)
-        response.raise_for_status()
-        return response.json().get('results', []), None
+        while len(movies) < num_movies:
+            response = requests.get(url, params=params, timeout=20)
+            response.raise_for_status()
+            page_results = response.json().get('results', [])
+            if not page_results:
+                break
+            movies.extend(page_results)
+            if params['page'] >= response.json().get('total_pages', 1):
+                break
+            params['page'] += 1
+        return movies[:num_movies], None
     except requests.RequestException as e:
         error_msg = f"TMDb API error (search_movies): {e}"
         print(error_msg)

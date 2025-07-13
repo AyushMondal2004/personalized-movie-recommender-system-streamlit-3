@@ -1,0 +1,133 @@
+import sys
+import os
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
+import streamlit as st
+from backend import auth, tmdb, recommender
+from backend.tmdb import discover_movies
+from backend.db import log_search_history
+
+st.set_page_config(page_title="Personalized Movie Recommender", layout="wide")
+
+if 'page' not in st.session_state:
+    st.session_state['page'] = 'login'
+
+# Page 1: Authentication
+if st.session_state['page'] == 'login':
+    st.title("Login")
+    st.info("Please enter your username and password to login.")
+    username = st.text_input("Username")
+    password = st.text_input("Password", type="password")
+    if st.button("Login"):
+        success, user = auth.login_user(username, password)
+        if success:
+            st.session_state['user'] = user
+            st.session_state['page'] = 'main'
+            st.success("Login successful! Welcome back.")
+            st.rerun()
+        else:
+            st.error(user)
+    if st.button("Go to Register"):
+        st.session_state['page'] = 'register'
+        st.rerun()
+
+elif st.session_state['page'] == 'register':
+    st.title("Register")
+    st.info("Create a new account. All fields are required except favorite genres.")
+    with st.form("register_form"):
+        username = st.text_input("Username")
+        name = st.text_input("Name")
+        phone = st.text_input("Phone")
+        email = st.text_input("Email")
+        address = st.text_input("Address")
+        password = st.text_input("Password", type="password")
+        dob = st.date_input("Date of Birth")
+        gender = st.selectbox("Gender", ["Male", "Female", "Other"])
+        genre_options = [
+            "Action", "Adventure", "Animation", "Comedy", "Crime", "Documentary", "Drama", "Family", "Fantasy", "History", "Horror", "Music", "Mystery", "Romance", "Science Fiction", "TV Movie", "Thriller", "War", "Western"
+        ]
+        genres = st.multiselect("Favorite Genres (optional)", genre_options)
+        submitted = st.form_submit_button("Register")
+        if submitted:
+            user_data = {
+                'username': username,
+                'name': name,
+                'phone': phone,
+                'email': email,
+                'address': address,
+                'password': password,
+                'dob': str(dob),
+                'gender': gender,
+                'genres': genres
+            }
+            success, msg = auth.register_user(user_data)
+            if success:
+                st.success(msg + " Please login.")
+                st.session_state['page'] = 'login'
+                st.rerun()
+            else:
+                st.error(msg)
+    if st.button("Go to Login"):
+        st.session_state['page'] = 'login'
+        st.rerun()
+
+
+
+elif st.session_state['page'] == 'main':
+    # Top-right logout button
+    col1, col2 = st.columns([8, 1])
+    with col2:
+        if st.button("Logout"):
+            st.session_state.clear()
+            st.session_state['page'] = 'login'
+            st.rerun()
+    # Sidebar filters
+    st.sidebar.header("Advanced Filters")
+    genre_options = {
+        "Action": 28, "Adventure": 12, "Animation": 16, "Comedy": 35, "Crime": 80, "Documentary": 99, "Drama": 18, "Family": 10751, "Fantasy": 14, "History": 36, "Horror": 27, "Music": 10402, "Mystery": 9648, "Romance": 10749, "Science Fiction": 878, "TV Movie": 10770, "Thriller": 53, "War": 10752, "Western": 37
+    }
+    selected_genres = st.sidebar.multiselect("Genres", list(genre_options.keys()))
+    year_range = st.sidebar.slider("Release Year", 1950, 2025, (2000, 2025))
+    filter_clicked = st.sidebar.button("Apply Filters")
+
+    with col1:
+        st.title("CineMatch: Your Personal Movie Companion")
+        user = st.session_state.get('user', {})
+        user_name = user.get('name') or user.get('username', 'User')
+        st.markdown(f"### Welcome, {user_name}!")
+        st.subheader("Search for Movies")
+        with st.form("search_form"):
+            query = st.text_input("Movie Title")
+            search_clicked = st.form_submit_button("Search")
+        results, api_error = [], None
+        # Priority: Filters > Title Search > Trending
+        user_id = user.get('_id') or user.get('username')
+        if filter_clicked and (selected_genres or year_range):
+            genre_ids = [genre_options[g] for g in selected_genres]
+            # If full range is selected, ignore year filter
+            year = None if year_range == (1950, 2025) else year_range[0]
+            with st.spinner("Searching with filters..."):
+                results, api_error = tmdb.discover_movies(genres=genre_ids, year=year)
+            # Log filter search
+            log_search_history(user_id, query=None, genres=selected_genres, year=year)
+        elif query and search_clicked:
+            with st.spinner("Searching for movies..."):
+                results, api_error = tmdb.search_movies(query)
+            # Log title search
+            log_search_history(user_id, query=query, genres=None, year=None)
+        elif not query and not filter_clicked:
+            with st.spinner("Loading trending movies..."):
+                results, api_error = tmdb.get_trending_movies()
+        if api_error:
+            st.error(f"Movie search failed: {api_error}")
+        elif ((query and search_clicked) or filter_clicked) and not results:
+            st.warning("No movies found for your search.")
+        elif results:
+            for movie in results[:20]:
+                st.image(f"https://image.tmdb.org/t/p/w200{movie.get('poster_path')}", width=100)
+                st.write(f"**{movie.get('title')}** ({movie.get('release_date', '')[:4]})")
+                st.write(f"Genres: {', '.join([str(g) for g in movie.get('genre_ids', [])])}")
+                st.write(f"Rating: {movie.get('vote_average', 0)}/10")
+                if st.button(f"View Details {movie.get('id')}"):
+                    # TODO: Display details, update history, show recommendations
+                    pass

@@ -1,0 +1,41 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environment
+venv/
+ENV/
+.venv/
+
+# Environment variables
+.env
+.env.*
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# VS Code settings
+.vscode/
+
+# PyCharm settings
+.idea/
+
+# Log files
+*.log
+
+# Test and coverage outputs
+htmlcov/
+.coverage
+.tox/
+.nox/
+.coverage.*
+.cache
+.pytest_cache/
+
+# Streamlit secrets
+.streamlit/secrets.toml

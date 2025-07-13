@@ -1,0 +1,9 @@
+streamlit==1.33.0
+pymongo==4.7.2
+python-dotenv==1.0.1
+requests==2.31.0
+scikit-learn==1.4.2
+numpy==1.26.4
+pandas==2.2.2
+bcrypt==4.1.2
+email-validator==2.1.1

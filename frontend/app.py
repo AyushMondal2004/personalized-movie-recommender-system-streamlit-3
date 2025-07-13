@@ -154,7 +154,6 @@ elif st.session_state['page'] == 'main':
     year_range = st.sidebar.slider("Release Year", 1950, 2025, (2000, 2025))
     filter_clicked = st.sidebar.button("Apply Filters")
 
-    
     st.title("CineMatch: Your Personal Movie Companion")
     user = st.session_state.get('user', {})
     user_name = user.get('name') or user.get('username', 'User')

@@ -107,17 +107,18 @@ elif st.session_state['page'] == 'main':
             # If full range is selected, ignore year filter
             year = None if year_range == (1950, 2025) else year_range[0]
             with st.spinner("Searching with filters..."):
-                results, api_error = tmdb.discover_movies(genres=genre_ids, year=year)
+                results, api_error = tmdb.discover_movies(genres=genre_ids, year=year, num_movies=50)
             # Log filter search
             log_search_history(user_id, query=None, genres=selected_genres, year=year)
         elif query and search_clicked:
             with st.spinner("Searching for movies..."):
                 results, api_error = tmdb.search_movies(query)
+        # If search_movies is also paginated, use num_movies=50 if implemented
             # Log title search
             log_search_history(user_id, query=query, genres=None, year=None)
         elif not query and not filter_clicked:
             with st.spinner("Loading trending movies..."):
-                results, api_error = tmdb.get_trending_movies()
+                results, api_error = tmdb.get_trending_movies(num_movies=50)
         if api_error:
             st.error(f"Movie search failed: {api_error}")
         elif ((query and search_clicked) or filter_clicked) and not results:

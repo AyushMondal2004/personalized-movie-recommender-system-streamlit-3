@@ -21,13 +21,22 @@ def search_movies(query):
         return [], error_msg
 
 
-def get_trending_movies():
+def get_trending_movies(num_movies=50):
     url = f"{TMDB_BASE_URL}/trending/movie/week"
-    params = {'api_key': TMDB_API_KEY}
+    params = {'api_key': TMDB_API_KEY, 'page': 1}
+    movies = []
     try:
-        response = requests.get(url, params=params, timeout=20)
-        response.raise_for_status()
-        return response.json().get('results', []), None
+        while len(movies) < num_movies:
+            response = requests.get(url, params=params, timeout=20)
+            response.raise_for_status()
+            page_results = response.json().get('results', [])
+            if not page_results:
+                break
+            movies.extend(page_results)
+            if params['page'] >= response.json().get('total_pages', 1):
+                break
+            params['page'] += 1
+        return movies[:num_movies], None
     except requests.RequestException as e:
         error_msg = f"TMDb API error (get_trending_movies): {e}"
         print(error_msg)
@@ -46,17 +55,26 @@ def get_movie_details(movie_id):
         return {}
 
 
-def discover_movies(genres=None, year=None):
+def discover_movies(genres=None, year=None, num_movies=50):
     url = f"{TMDB_BASE_URL}/discover/movie"
-    params = {'api_key': TMDB_API_KEY, 'sort_by': 'popularity.desc'}
+    params = {'api_key': TMDB_API_KEY, 'sort_by': 'popularity.desc', 'page': 1}
     if genres:
         params['with_genres'] = ','.join(str(g) for g in genres)
     if year:
         params['primary_release_year'] = year
+    movies = []
     try:
-        response = requests.get(url, params=params, timeout=20)
-        response.raise_for_status()
-        return response.json().get('results', []), None
+        while len(movies) < num_movies:
+            response = requests.get(url, params=params, timeout=20)
+            response.raise_for_status()
+            page_results = response.json().get('results', [])
+            if not page_results:
+                break
+            movies.extend(page_results)
+            if params['page'] >= response.json().get('total_pages', 1):
+                break
+            params['page'] += 1
+        return movies[:num_movies], None
     except requests.RequestException as e:
         error_msg = f"TMDb API error (discover_movies): {e}"
         print(error_msg)

@@ -75,7 +75,7 @@ elif st.session_state['page'] == 'register':
 
 elif st.session_state['page'] == 'main':
     # Top-right logout button
-    col2 = st.columns([1])[0]
+    col1, col2 = st.columns([8, 1])
     with col2:
         if st.button("Logout"):
             st.session_state.clear()

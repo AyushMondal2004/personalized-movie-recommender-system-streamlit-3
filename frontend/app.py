@@ -82,6 +82,15 @@ elif st.session_state['page'] == 'main':
             st.session_state['page'] = 'login'
             st.rerun()
 
+    # Sidebar filters (must be defined before use)
+    st.sidebar.header("Advanced Filters")
+    genre_options = {
+        "Action": 28, "Adventure": 12, "Animation": 16, "Comedy": 35, "Crime": 80, "Documentary": 99, "Drama": 18, "Family": 10751, "Fantasy": 14, "History": 36, "Horror": 27, "Music": 10402, "Mystery": 9648, "Romance": 10749, "Science Fiction": 878, "TV Movie": 10770, "Thriller": 53, "War": 10752, "Western": 37
+    }
+    selected_genres = st.sidebar.multiselect("Genres", list(genre_options.keys()))
+    year_range = st.sidebar.slider("Release Year", 1950, 2025, (2000, 2025))
+    filter_clicked = st.sidebar.button("Apply Filters")
+
     # Main UI (welcome, search, grid, etc.)
     st.title("CineMatch: Your Personal Movie Companion")
     user = st.session_state.get('user', {})

@@ -45,7 +45,15 @@ def get_trending_movies(num_movies=50):
             if params['page'] >= response.json().get('total_pages', 1):
                 break
             params['page'] += 1
-        return movies[:num_movies], None
+        # Remove duplicates by movie 'id'
+        seen_ids = set()
+        unique_movies = []
+        for movie in movies:
+            movie_id = movie.get('id')
+            if movie_id not in seen_ids:
+                seen_ids.add(movie_id)
+                unique_movies.append(movie)
+        return unique_movies[:num_movies], None
     except requests.RequestException as e:
         error_msg = f"TMDb API error (get_trending_movies): {e}"
         print(error_msg)

@@ -15,15 +15,14 @@ if 'page' not in st.session_state:
 if st.session_state['page'] == 'login':
     st.title("Login")
     st.info("Please enter your username or email and password to login.")
+
     identifier = st.text_input("Username or Email")
     password = st.text_input("Password", type="password")
 
-    if 'forgot_pw_mode' not in st.session_state:
-        st.session_state['forgot_pw_mode'] = False
-    if 'reset_pw_email' not in st.session_state:
-        st.session_state['reset_pw_email'] = ''
-    if 'reset_pw_otp_sent' not in st.session_state:
-        st.session_state['reset_pw_otp_sent'] = False
+    # Init session states
+    st.session_state.setdefault('forgot_pw_mode', False)
+    st.session_state.setdefault('reset_pw_email', '')
+    st.session_state.setdefault('reset_pw_otp_sent', False)
 
     if not st.session_state['forgot_pw_mode']:
         if st.button("Login"):
@@ -38,7 +37,7 @@ if st.session_state['page'] == 'login':
 
         if st.button("Forgot Password?"):
             st.session_state['forgot_pw_mode'] = True
-            st.experimental_rerun()
+            st.rerun()
 
         if st.button("Go to Register"):
             st.session_state['page'] = 'register'
@@ -46,51 +45,56 @@ if st.session_state['page'] == 'login':
 
     else:
         st.subheader("Forgot Password")
+
         if not st.session_state['reset_pw_otp_sent']:
             email = st.text_input("Enter your registered email", value=st.session_state['reset_pw_email'])
+
             if st.button("Send OTP"):
                 success, msg = auth.initiate_password_reset(email)
                 st.session_state['reset_pw_email'] = email
                 if success:
                     st.session_state['reset_pw_otp_sent'] = True
                     st.success(msg)
+                    st.rerun()
                 else:
                     st.error(msg)
+
             if st.button("Back to Login"):
                 st.session_state['forgot_pw_mode'] = False
                 st.session_state['reset_pw_email'] = ''
                 st.session_state['reset_pw_otp_sent'] = False
-                st.experimental_rerun()
+                st.rerun()
         else:
-            st.success(f"OTP sent to: {st.session_state['reset_pw_email']}")
+            st.write(f"OTP sent to: {st.session_state['reset_pw_email']}")
             otp = st.text_input("Enter OTP")
             new_password = st.text_input("New Password", type="password")
-            col1, col2, col3 = st.columns(3)
+
+            col1, col2 = st.columns([1, 1])
             with col1:
                 if st.button("Reset Password"):
                     success, msg = auth.reset_password(st.session_state['reset_pw_email'], otp, new_password)
                     if success:
-                        st.success("Password reset successful! Please login with your new password.")
+                        st.success("Password reset successful! Please login.")
                         st.session_state['forgot_pw_mode'] = False
                         st.session_state['reset_pw_email'] = ''
                         st.session_state['reset_pw_otp_sent'] = False
-                        st.experimental_rerun()
+                        st.rerun()
                     else:
                         st.error(msg)
+
             with col2:
                 if st.button("Resend OTP"):
                     success, msg = auth.initiate_password_reset(st.session_state['reset_pw_email'])
                     if success:
-                        st.success("OTP resent successfully! Please check your email.")
+                        st.success("OTP resent successfully.")
                     else:
                         st.error(msg)
-            with col3:
-                if st.button("Back to Login"):
-                    st.session_state['forgot_pw_mode'] = False
-                    st.session_state['reset_pw_email'] = ''
-                    st.session_state['reset_pw_otp_sent'] = False
-                    st.experimental_rerun()
 
+            if st.button("Back to Login"):
+                st.session_state['forgot_pw_mode'] = False
+                st.session_state['reset_pw_email'] = ''
+                st.session_state['reset_pw_otp_sent'] = False
+                st.rerun()
 
 # ✅ Page 2: Registration
 elif st.session_state['page'] == 'register':
@@ -237,12 +241,15 @@ elif st.session_state['page'] == 'main':
                     details = tmdb.get_movie_details(movie.get('id'))
                     cast = details.get('credits', {}).get('cast', [])
                     main_cast = ', '.join([c['name'] for c in cast[:2]]) if cast else ''
-                    st.markdown(f"""
-                        **{movie.get('title')} ({movie.get('release_date', '')[:4]})**
-                        - Genres: {', '.join(genre_names)}
-                        - Rating: {movie.get('vote_average', 0):.2f}/10
-                        - Main Cast: {main_cast}
-                    """)
+                    movie_html = f'''
+                    <div class="movie-card">
+                        <div class="movie-title">{movie.get('title', 'No Title')} ({movie.get('release_date', '')[:4]})</div>
+                        <div class="movie-info">Genres: {', '.join(genre_names)}</div>
+                        <div class="movie-rating">Rating: {movie.get('vote_average', 0):.2f}/10</div>
+                        <div class="movie-cast">Main Cast: {main_cast}</div>
+                    </div>
+                    '''
+                    st.markdown(movie_html, unsafe_allow_html=True)
 
 # ✅ Inject Custom CSS
 with open(os.path.join(os.path.dirname(__file__), "style.css")) as f:

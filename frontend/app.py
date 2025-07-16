@@ -145,7 +145,7 @@ elif st.session_state['page'] == 'register':
 
 # ✅ Page 3: Main Movie Search with Filters
 elif st.session_state['page'] == 'main':
-    set_bg_from_file(os.path.join(os.path.dirname(__file__), '../backend/image/page2.jpg'))
+    set_bg_from_file(os.path.join(os.path.dirname(__file__), 'images/page2.jpg'))
     if st.button("Logout"):
         st.session_state.clear()
         st.session_state['page'] = 'login'

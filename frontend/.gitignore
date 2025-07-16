@@ -1,0 +1,4 @@
+# Ignore all images except those in images/
+!/images/
+!/images/page1.jpg
+!/images/page2.jpg

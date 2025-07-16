@@ -21,20 +21,26 @@ def login_user(identifier, password):
     return False, 'Invalid username/email or password.'
 
 
+from datetime import datetime, timedelta
+
 def initiate_password_reset(email):
     user = user_col.find_one({'email': email})
     if not user:
         return False, 'Email not found.'
     otp = generate_otp()
-    otp_col.insert_one({'email': email, 'otp': otp})
+    expiry = datetime.utcnow() + timedelta(minutes=10)
+    otp_col.insert_one({'email': email, 'otp': otp, 'expires_at': expiry})
     send_otp_email(email, otp)
-    return True, 'OTP sent to email.'
+    return True, 'OTP sent to email (valid for 10 minutes).'
 
 
 def reset_password(email, otp, new_password):
-    record = otp_col.find_one({'email': email, 'otp': otp})
+    # Clean up expired OTPs
+    now = datetime.utcnow()
+    otp_col.delete_many({'expires_at': {'$lt': now}})
+    record = otp_col.find_one({'email': email, 'otp': otp, 'expires_at': {'$gte': now}})
     if not record:
-        return False, 'Invalid OTP.'
+        return False, 'Invalid or expired OTP.'
     hashed_pw = bcrypt.hashpw(new_password.encode(), bcrypt.gensalt())
     user_col.update_one({'email': email}, {'$set': {'password': hashed_pw}})
     otp_col.delete_many({'email': email})

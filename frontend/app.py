@@ -17,18 +17,65 @@ if st.session_state['page'] == 'login':
     st.info("Please enter your username or email and password to login.")
     identifier = st.text_input("Username or Email")
     password = st.text_input("Password", type="password")
-    if st.button("Login"):
-        success, user = auth.login_user(identifier, password)
-        if success:
-            st.session_state['user'] = user
-            st.session_state['page'] = 'main'
-            st.success("Login successful! Welcome back.")
+    if 'forgot_pw_mode' not in st.session_state:
+        st.session_state['forgot_pw_mode'] = False
+    if 'reset_pw_email' not in st.session_state:
+        st.session_state['reset_pw_email'] = ''
+    if 'reset_pw_otp_sent' not in st.session_state:
+        st.session_state['reset_pw_otp_sent'] = False
+
+    if not st.session_state['forgot_pw_mode']:
+        if st.button("Login"):
+            success, user = auth.login_user(identifier, password)
+            if success:
+                st.session_state['user'] = user
+                st.session_state['page'] = 'main'
+                st.success("Login successful! Welcome back.")
+                st.rerun()
+            else:
+                st.error(user)
+        if st.button("Forgot Password?"):
+            st.session_state['forgot_pw_mode'] = True
+            st.experimental_rerun()
+        if st.button("Go to Register"):
+            st.session_state['page'] = 'register'
             st.rerun()
+    else:
+        st.subheader("Forgot Password")
+        if not st.session_state['reset_pw_otp_sent']:
+            email = st.text_input("Enter your registered email", value=st.session_state['reset_pw_email'])
+            if st.button("Send OTP"):
+                success, msg = auth.initiate_password_reset(email)
+                st.session_state['reset_pw_email'] = email
+                if success:
+                    st.session_state['reset_pw_otp_sent'] = True
+                    st.success(msg)
+                else:
+                    st.error(msg)
+            if st.button("Back to Login"):
+                st.session_state['forgot_pw_mode'] = False
+                st.session_state['reset_pw_email'] = ''
+                st.session_state['reset_pw_otp_sent'] = False
+                st.experimental_rerun()
         else:
-            st.error(user)
-    if st.button("Go to Register"):
-        st.session_state['page'] = 'register'
-        st.rerun()
+            st.write(f"OTP sent to: {st.session_state['reset_pw_email']}")
+            otp = st.text_input("Enter OTP")
+            new_password = st.text_input("New Password", type="password")
+            if st.button("Reset Password"):
+                success, msg = auth.reset_password(st.session_state['reset_pw_email'], otp, new_password)
+                if success:
+                    st.success("Password reset successful! Please login with your new password.")
+                    st.session_state['forgot_pw_mode'] = False
+                    st.session_state['reset_pw_email'] = ''
+                    st.session_state['reset_pw_otp_sent'] = False
+                else:
+                    st.error(msg)
+            if st.button("Back to Login"):
+                st.session_state['forgot_pw_mode'] = False
+                st.session_state['reset_pw_email'] = ''
+                st.session_state['reset_pw_otp_sent'] = False
+                st.experimental_rerun()
+
 
 elif st.session_state['page'] == 'register':
     st.title("Register")

@@ -72,17 +72,48 @@ h1, h2, h3, .stTitle, .stHeader, .stSubheader {
 /* Input and button styles */
 input, textarea, select, .stTextInput > div > input {
     font-family: 'Poppins', Arial, sans-serif !important;
-    background: rgba(35, 41, 70, 0.55) !important;
+    background: #3a3a3a !important;
     color: #f4faff !important;
-    border-radius: 12px !important;
-    border: 2px solid #b8c1ec !important;
-    padding: 10px 10px !important;
-    margin-bottom: 14px;
-    box-shadow: 0 2px 18px 0 rgba(85, 150, 255, 0.07), 0 1.5px 8px 0 rgba(255, 216, 3, 0.08);
-    backdrop-filter: blur(4px);
-    transition: border 0.25s, box-shadow 0.25s, background 0.25s;
-    font-size: 1.09em;
+    border-radius: 14px !important;
+    border: 2.5px solid #888 !important;
+    padding: 18px 20px !important;
+    margin-bottom: 18px;
+    box-shadow: 0 4px 18px 0 rgba(60, 60, 60, 0.11), 0 2px 8px 0 rgba(0,0,0,0.10);
+    font-size: 1.23em;
+    min-height: 54px;
+    min-width: 260px;
+    max-width: 100%;
+    transition: border 0.22s, box-shadow 0.22s, background 0.22s, color 0.22s, transform 0.18s;
 }
+input:focus, textarea:focus, select:focus, .stTextInput > div > input:focus {
+    outline: none !important;
+    background: #555 !important;
+    border: 2.5px solid #ffd803 !important;
+    color: #fff !important;
+    box-shadow: 0 0 0 4px #ffd80333, 0 2px 18px 0 #ffd80322;
+    transform: scale(1.04);
+}
+
+/* Streamlit selectbox/multiselect wrappers */
+.stSelectbox, .stMultiSelect {
+    background: #3a3a3a !important;
+    border-radius: 14px !important;
+    border: 2.5px solid #888 !important;
+    box-shadow: 0 4px 18px 0 rgba(60, 60, 60, 0.11), 0 2px 8px 0 rgba(0,0,0,0.10);
+    min-height: 54px;
+    min-width: 260px;
+    max-width: 100%;
+    font-size: 1.23em !important;
+    color: #f4faff !important;
+}
+.stSelectbox:focus, .stMultiSelect:focus {
+    background: #555 !important;
+    border: 2.5px solid #ffd803 !important;
+    color: #fff !important;
+    box-shadow: 0 0 0 4px #ffd80333, 0 2px 18px 0 #ffd80322;
+    transform: scale(1.04);
+}
+
 input:focus, textarea:focus, select:focus, .stTextInput > div > input:focus {
     outline: none !important;
     border: 2.5px solid #ffd803 !important;

@@ -125,7 +125,7 @@ elif st.session_state['page'] == 'main':
         st.warning("No movies found for your search.")
     elif results:
         # Sort results by vote_count in descending order
-        results = sorted(results, key=lambda m: m.get('vote_count', 0), reverse=True)
+        results = sorted(results, key=lambda m: m.get('vote_count', 0))
         # Genre ID to name mapping (should match TMDb)
         genre_id_to_name = {28: "Action", 12: "Adventure", 16: "Animation", 35: "Comedy", 80: "Crime", 99: "Documentary", 18: "Drama", 10751: "Family", 14: "Fantasy", 36: "History", 27: "Horror", 10402: "Music", 9648: "Mystery", 10749: "Romance", 878: "Science Fiction", 10770: "TV Movie", 53: "Thriller", 10752: "War", 37: "Western"}
         num_cols = 4

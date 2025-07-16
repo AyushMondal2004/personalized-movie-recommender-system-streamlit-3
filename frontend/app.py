@@ -5,7 +5,6 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 import streamlit as st
 from backend import auth, tmdb
 from backend.db import log_search_history
-from set_bg import set_bg_from_file
 
 st.set_page_config(page_title="Personalized Movie Recommender", layout="wide")
 
@@ -14,7 +13,6 @@ if 'page' not in st.session_state:
 
 # ✅ Page 1: Authentication with Forgot Password + Resend OTP
 if st.session_state['page'] == 'login':
-    set_bg_from_file(os.path.join(os.path.dirname(__file__), 'images/page1.jpg'))
     st.title("Login")
     st.info("Please enter your username or email and password to login.")
 
@@ -100,7 +98,6 @@ if st.session_state['page'] == 'login':
 
 # ✅ Page 2: Registration
 elif st.session_state['page'] == 'register':
-    set_bg_from_file(os.path.join(os.path.dirname(__file__), 'images/page1.jpg'))
     st.title("Register")
     st.info("Create a new account. All fields are required except favorite genres.")
     with st.form("register_form"):
@@ -142,10 +139,8 @@ elif st.session_state['page'] == 'register':
         st.session_state['page'] = 'login'
         st.rerun()
 
-
 # ✅ Page 3: Main Movie Search with Filters
 elif st.session_state['page'] == 'main':
-    set_bg_from_file(os.path.join(os.path.dirname(__file__), 'images/page2.jpg'))
     if st.button("Logout"):
         st.session_state.clear()
         st.session_state['page'] = 'login'

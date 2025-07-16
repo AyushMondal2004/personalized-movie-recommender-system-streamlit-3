@@ -98,6 +98,11 @@ elif st.session_state['page'] == 'main':
         ("Any", ""), ("United States", "US"), ("India", "IN"), ("France", "FR"), ("Spain", "ES"), ("Germany", "DE"), ("Japan", "JP"), ("Korea", "KR"), ("China", "CN"), ("Italy", "IT"), ("Russia", "RU")
     ]
     selected_region = st.sidebar.selectbox("Region", [x[0] for x in region_options], index=0)
+    # Safe mapping for codes
+    language_map = dict(language_options)
+    region_map = dict(region_options)
+    language_code = language_map.get(selected_language, None)
+    region_code = region_map.get(selected_region, None)
     filter_clicked = st.sidebar.button("Apply Filters")
 
     # Main UI (welcome, search, grid, etc.)

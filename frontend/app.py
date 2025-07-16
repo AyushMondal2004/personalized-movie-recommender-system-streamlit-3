@@ -4,7 +4,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 import streamlit as st
 from backend import auth, tmdb, recommender
-from backend.tmdb import discover_movies
+
 from backend.db import log_search_history
 
 st.set_page_config(page_title="Personalized Movie Recommender", layout="wide")

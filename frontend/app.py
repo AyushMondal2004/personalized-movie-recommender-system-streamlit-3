@@ -14,7 +14,7 @@ if 'page' not in st.session_state:
 
 # ✅ Page 1: Authentication with Forgot Password + Resend OTP
 if st.session_state['page'] == 'login':
-    set_bg_from_file(os.path.join(os.path.dirname(__file__), '../backend/image/page1.jpg'))
+    set_bg_from_file(os.path.join(os.path.dirname(__file__), 'images/page1.jpg'))
     st.title("Login")
     st.info("Please enter your username or email and password to login.")
 
@@ -100,7 +100,7 @@ if st.session_state['page'] == 'login':
 
 # ✅ Page 2: Registration
 elif st.session_state['page'] == 'register':
-    set_bg_from_file(os.path.join(os.path.dirname(__file__), '../backend/image/page1.jpg'))
+    set_bg_from_file(os.path.join(os.path.dirname(__file__), 'images/page1.jpg'))
     st.title("Register")
     st.info("Create a new account. All fields are required except favorite genres.")
     with st.form("register_form"):

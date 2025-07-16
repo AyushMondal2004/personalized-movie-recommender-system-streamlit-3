@@ -88,16 +88,25 @@ elif st.session_state['page'] == 'main':
         "Action": 28, "Adventure": 12, "Animation": 16, "Comedy": 35, "Crime": 80, "Documentary": 99, "Drama": 18, "Family": 10751, "Fantasy": 14, "History": 36, "Horror": 27, "Music": 10402, "Mystery": 9648, "Romance": 10749, "Science Fiction": 878, "TV Movie": 10770, "Thriller": 53, "War": 10752, "Western": 37
     }
     selected_genres = st.sidebar.multiselect("Genres", list(genre_options.keys()), key="sidebar_genres_main")
-    year_range = st.sidebar.slider("Release Year", 1950, 2025, (2000, 2025))
-    vote_average_range = st.sidebar.slider("Rating", 0.0, 10.0, (0.0, 10.0), step=0.1)
+    year_range = st.sidebar.slider("Release Year", 1950, 2025, (2000, 2025), key="sidebar_year_main")
+    vote_average_range = st.sidebar.slider("Rating", 0.0, 10.0, (0.0, 10.0), step=0.1, key="sidebar_rating_main")
     language_options = [
         ("Any", ""), ("English", "en"), ("Hindi", "hi"), ("French", "fr"), ("Spanish", "es"), ("German", "de"), ("Japanese", "ja"), ("Korean", "ko"), ("Chinese", "zh"), ("Italian", "it"), ("Russian", "ru")
     ]
-    selected_language = st.sidebar.selectbox("Language", [x[0] for x in language_options], index=0)
+    selected_language = st.sidebar.selectbox("Language", [x[0] for x in language_options], index=0, key="sidebar_language_main")
     region_options = [
         ("Any", ""), ("United States", "US"), ("India", "IN"), ("France", "FR"), ("Spain", "ES"), ("Germany", "DE"), ("Japan", "JP"), ("Korea", "KR"), ("China", "CN"), ("Italy", "IT"), ("Russia", "RU")
     ]
-    selected_region = st.sidebar.selectbox("Region", [x[0] for x in region_options], index=0)
+    selected_region = st.sidebar.selectbox("Region", [x[0] for x in region_options], index=0, key="sidebar_region_main")
+    # Add Clear Filters button
+    clear_filters = st.sidebar.button("Clear Filters")
+    if clear_filters:
+        st.session_state["sidebar_genres_main"] = []
+        st.session_state["sidebar_year_main"] = (2000, 2025)
+        st.session_state["sidebar_rating_main"] = (0.0, 10.0)
+        st.session_state["sidebar_language_main"] = "Any"
+        st.session_state["sidebar_region_main"] = "Any"
+        st.experimental_rerun()
     # Safe mapping for codes
     language_map = dict(language_options)
     region_map = dict(region_options)

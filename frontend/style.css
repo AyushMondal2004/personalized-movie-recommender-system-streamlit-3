@@ -4,11 +4,9 @@ html, body, .stApp {
     font-family: 'Poppins', Arial, sans-serif !important;
     background: #121212;
     color: #e0e0e0;
-    min-height: 100vh;
-    letter-spacing: 0.015em;
 }
 
-/* Compact Glassmorphism Cards */
+/* Compact Glassmorphism Movie Cards */
 .movie-card {
     background: rgba(255, 255, 255, 0.05);
     border-radius: 10px;
@@ -18,10 +16,12 @@ html, body, .stApp {
     margin-bottom: 10px;
     transition: transform 0.15s, box-shadow 0.15s;
 }
+
 .movie-card:hover {
     transform: translateY(-1px) scale(1.01);
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
 }
+
 .movie-title {
     font-family: 'Montserrat', Arial, sans-serif;
     font-size: 0.95em;
@@ -29,123 +29,16 @@ html, body, .stApp {
     color: #ffcc00;
     margin-bottom: 3px;
 }
-.movie-info, .movie-cast {
+
+.movie-info,
+.movie-cast {
     font-size: 0.78em;
     color: #cccccc;
     margin-bottom: 2px;
 }
+
 .movie-rating {
     font-size: 0.8em;
     color: #ffb703;
     font-weight: 600;
-}
-
-/* Headings */
-h1, h2, h3, .stTitle, .stHeader, .stSubheader {
-    font-family: 'Montserrat', Arial, sans-serif !important;
-    font-weight: 700;
-    color: #ffcc00 !important;
-    letter-spacing: 0.5px;
-    font-size: 1.2em !important;
-}
-
-/* Inputs & Selects */
-input, textarea, select, .stTextInput > div > input {
-    font-family: 'Poppins', Arial, sans-serif !important;
-    background: #1e1e1e !important;
-    color: #f0f0f0 !important;
-    border-radius: 4px !important;
-    border: 1px solid #444 !important;
-    padding: 4px 6px !important;
-    font-size: 0.75em;
-    min-height: 24px;
-    box-shadow: none !important;
-}
-input:focus, textarea:focus, select:focus {
-    border: 1.2px solid #ffcc00 !important;
-    background: #2a2a2a !important;
-}
-
-/* Compact Buttons */
-button, .stButton > button {
-    font-family: 'Montserrat', Arial, sans-serif !important;
-    background: #ffcc00;
-    color: #121212 !important;
-    border-radius: 6px !important;
-    border: none !important;
-    font-weight: 600;
-    font-size: 0.85em;
-    padding: 5px 14px !important;
-    margin: 4px 0;
-    transition: all 0.15s ease-in-out;
-}
-button:hover, .stButton > button:hover {
-    background: #e0b000;
-    transform: scale(1.02);
-}
-button:active, .stButton > button:active {
-    transform: scale(0.96);
-}
-
-/* Streamlit Selectbox & Multiselect */
-/* Align dropdown height with text label */
-div[data-baseweb="select"] {
-    font-size: 0.75em !important;
-    min-height: 26px !important;
-    background: #1e1e1e !important;
-    border-radius: 4px !important;
-    border: 1px solid #444 !important;
-    line-height: 1.2em !important;
-}
-
-/* Compact the selectbox inner padding */
-div[data-baseweb="select"] > div {
-    padding: 2px 6px !important;
-}
-
-/* Compact the dropdown options */
-ul[role="listbox"] {
-    font-size: 0.75em !important;
-}
-
-/* Compact the select arrow size */
-svg[data-icon="chevron-down"] {
-    width: 14px !important;
-    height: 14px !important;
-}
-
-/* Alerts */
-.stAlert, .stSuccess, .stError, .stInfo {
-    border-radius: 6px !important;
-    font-size: 0.8em !important;
-}
-
-/* Forms */
-.stForm {
-    background: rgba(255, 255, 255, 0.03);
-    padding: 10px;
-    border-radius: 8px;
-    border: 1px solid #333;
-}
-
-/* Sidebar */
-.stSidebar {
-    background: #1c1c1c;
-}
-
-/* Images */
-img {
-    border-radius: 6px;
-    max-width: 100%;
-    height: auto;
-}
-
-/* Scrollbar */
-::-webkit-scrollbar {
-    width: 4px;
-    background: #1e1e1e;
-}
-::-webkit-scrollbar-thumb {
-    background: #555;
-    border-radius: 4px;
 }

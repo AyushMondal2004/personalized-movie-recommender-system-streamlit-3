@@ -64,13 +64,17 @@ def get_movie_details(movie_id):
         return {}
 
 
-def discover_movies(genres=None, year=None, num_movies=50):
+def discover_movies(genres=None, year=None, num_movies=50, language=None, region=None):
     url = f"{TMDB_BASE_URL}/discover/movie"
     params = {'api_key': TMDB_API_KEY, 'sort_by': 'popularity.desc', 'page': 1}
     if genres:
         params['with_genres'] = ','.join(str(g) for g in genres)
     if year:
         params['primary_release_year'] = year
+    if language:
+        params['with_original_language'] = language
+    if region:
+        params['region'] = region
     movies = []
     try:
         while len(movies) < num_movies:

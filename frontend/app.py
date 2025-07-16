@@ -89,7 +89,15 @@ elif st.session_state['page'] == 'main':
     }
     selected_genres = st.sidebar.multiselect("Genres", list(genre_options.keys()), key="sidebar_genres_main")
     year_range = st.sidebar.slider("Release Year", 1950, 2025, (2000, 2025))
-    vote_average_range = st.sidebar.slider("Vote Average Range", 0.0, 10.0, (0.0, 10.0), step=0.1)
+    vote_average_range = st.sidebar.slider("Rating", 0.0, 10.0, (0.0, 10.0), step=0.1)
+    language_options = [
+        ("Any", ""), ("English", "en"), ("Hindi", "hi"), ("French", "fr"), ("Spanish", "es"), ("German", "de"), ("Japanese", "ja"), ("Korean", "ko"), ("Chinese", "zh"), ("Italian", "it"), ("Russian", "ru")
+    ]
+    selected_language = st.sidebar.selectbox("Language", [x[0] for x in language_options], index=0)
+    region_options = [
+        ("Any", ""), ("United States", "US"), ("India", "IN"), ("France", "FR"), ("Spain", "ES"), ("Germany", "DE"), ("Japan", "JP"), ("Korea", "KR"), ("China", "CN"), ("Italy", "IT"), ("Russia", "RU")
+    ]
+    selected_region = st.sidebar.selectbox("Region", [x[0] for x in region_options], index=0)
     filter_clicked = st.sidebar.button("Apply Filters")
 
     # Main UI (welcome, search, grid, etc.)
@@ -104,12 +112,15 @@ elif st.session_state['page'] == 'main':
     results, api_error = [], None
     # Priority: Filters > Title Search > Trending
     user_id = user.get('_id') or user.get('username')
-    if filter_clicked and (selected_genres or year_range):
+    if filter_clicked and (selected_genres or year_range or selected_language or selected_region):
         genre_ids = [genre_options[g] for g in selected_genres]
         # If full range is selected, ignore year filter
         year = None if year_range == (1950, 2025) else year_range[0]
+        # Get language/region code
+        language_code = dict(language_options)[selected_language]
+        region_code = dict(region_options)[selected_region]
         with st.spinner("Searching with filters..."):
-            results, api_error = tmdb.discover_movies(genres=genre_ids, year=year, num_movies=50)
+            results, api_error = tmdb.discover_movies(genres=genre_ids, year=year, num_movies=50, language=language_code or None, region=region_code or None)
         # Log filter search
         log_search_history(user_id, query=None, genres=selected_genres, year=year)
     elif query and search_clicked:

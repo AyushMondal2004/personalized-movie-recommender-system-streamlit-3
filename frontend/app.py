@@ -14,11 +14,11 @@ if 'page' not in st.session_state:
 # Page 1: Authentication
 if st.session_state['page'] == 'login':
     st.title("Login")
-    st.info("Please enter your username and password to login.")
-    username = st.text_input("Username")
+    st.info("Please enter your username or email and password to login.")
+    identifier = st.text_input("Username or Email")
     password = st.text_input("Password", type="password")
     if st.button("Login"):
-        success, user = auth.login_user(username, password)
+        success, user = auth.login_user(identifier, password)
         if success:
             st.session_state['user'] = user
             st.session_state['page'] = 'main'

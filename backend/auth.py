@@ -13,11 +13,12 @@ def register_user(user_data):
     return True, 'Registration successful.'
 
 
-def login_user(username, password):
-    user = user_col.find_one({'username': username})
+def login_user(identifier, password):
+    # Allow login with either username or email
+    user = user_col.find_one({'$or': [{'username': identifier}, {'email': identifier}]})
     if user and bcrypt.checkpw(password.encode(), user['password']):
         return True, user
-    return False, 'Invalid username or password.'
+    return False, 'Invalid username/email or password.'
 
 
 def initiate_password_reset(email):

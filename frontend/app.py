@@ -89,6 +89,7 @@ elif st.session_state['page'] == 'main':
     }
     selected_genres = st.sidebar.multiselect("Genres", list(genre_options.keys()), key="sidebar_genres_main")
     year_range = st.sidebar.slider("Release Year", 1950, 2025, (2000, 2025))
+    vote_count_range = st.sidebar.slider("Vote Count Range", 0, 10000, (0, 10000), step=50)
     filter_clicked = st.sidebar.button("Apply Filters")
 
     # Main UI (welcome, search, grid, etc.)
@@ -124,6 +125,8 @@ elif st.session_state['page'] == 'main':
     elif ((query and search_clicked) or filter_clicked) and not results:
         st.warning("No movies found for your search.")
     elif results:
+        # Filter results by selected vote count range
+        results = [m for m in results if vote_count_range[0] <= m.get('vote_count', 0) <= vote_count_range[1]]
         # Sort results by vote_count in descending order
         results = sorted(results, key=lambda m: m.get('vote_count', 0), reverse=True)
         # Genre ID to name mapping (should match TMDb)

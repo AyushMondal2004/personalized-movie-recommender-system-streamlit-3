@@ -135,14 +135,22 @@ elif st.session_state['page'] == 'main':
             for j, movie in enumerate(movies_to_show[i:i+num_cols]):
                 with cols[j]:
                     st.image(f"https://image.tmdb.org/t/p/w200{movie.get('poster_path')}", width=150)
-                    # Movie title as clickable link to details page
-                    st.markdown(f"**{movie.get('title', 'No Title')} ({movie.get('release_date', '')[:4]})**")
+                    # Prepare movie info for HTML
                     genre_names = [genre_id_to_name.get(g, str(g)) for g in movie.get('genre_ids', [])]
-                    st.write(f"Genres: {', '.join(genre_names)}")
-                    st.write(f"Rating: {movie.get('vote_average', 0)}/10")
-                    # Show main two cast members if available
                     details = tmdb.get_movie_details(movie.get('id'))
                     cast = details.get('credits', {}).get('cast', [])
-                    if cast:
-                        main_cast = ', '.join([c['name'] for c in cast[:2]])
-                        st.write(f"Main Cast: {main_cast}")
+                    main_cast = ', '.join([c['name'] for c in cast[:2]]) if cast else ''
+                    movie_html = f'''
+                    <div class="movie-card">
+                        <div class="movie-title">{movie.get('title', 'No Title')} ({movie.get('release_date', '')[:4]})</div>
+                        <div class="movie-info">Genres: {', '.join(genre_names)}</div>
+                        <div class="movie-rating">Rating: {movie.get('vote_average', 0):.2f}/10</div>
+                        <div class="movie-cast">Main Cast: {main_cast}</div>
+                    </div>
+                    '''
+                    st.markdown(movie_html, unsafe_allow_html=True)
+
+# Inject custom CSS for movie cards
+with open(os.path.join(os.path.dirname(__file__), "style.css")) as f:
+    st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
+

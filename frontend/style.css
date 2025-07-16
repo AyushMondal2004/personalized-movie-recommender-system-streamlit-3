@@ -88,21 +88,30 @@ button:active, .stButton > button:active {
 }
 
 /* Streamlit Selectbox & Multiselect */
+/* Align dropdown height with text label */
 div[data-baseweb="select"] {
     font-size: 0.75em !important;
-    min-height: 3px !important;
+    min-height: 26px !important;
     background: #1e1e1e !important;
     border-radius: 4px !important;
     border: 1px solid #444 !important;
+    line-height: 1.2em !important;
 }
+
+/* Compact the selectbox inner padding */
 div[data-baseweb="select"] > div {
-    padding: 1px 2px !important;
+    padding: 2px 6px !important;
 }
-div[data-baseweb="select"]:focus-within {
-    border: 1.2px solid #ffcc00 !important;
-}
+
+/* Compact the dropdown options */
 ul[role="listbox"] {
     font-size: 0.75em !important;
+}
+
+/* Compact the select arrow size */
+svg[data-icon="chevron-down"] {
+    width: 14px !important;
+    height: 14px !important;
 }
 
 /* Alerts */
